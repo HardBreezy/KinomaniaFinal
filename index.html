@@ -400,7 +400,7 @@ function HomePage({movies,onMovie}){
     <div className="page">
       <div className="home-grid">
         <div>
-          <div className="section-title">ОЖИДАЕМЫЕ НОВИНКИ</div>
+          <div className="section-title" style={{textAlign:'center'}}> ОЖИДАЕМЫЕ НОВИНКИ</div>
           <div className="genre-block"><div className="genre-label">БОЕВИК</div>
             <div className="genre-row">{action.map(m=><Thumb key={m.id} movie={m}/>)}</div></div>
           <div className="genre-block"><div className="genre-label">КОМЕДИЯ</div>
@@ -413,7 +413,7 @@ function HomePage({movies,onMovie}){
           </div>
         </div>
         <div>
-          <div className="section-title" style={{textAlign:'right'}}>БЛИЖАЙШИЕ РЕЛИЗЫ</div>
+          <div className="section-title" style={{textAlign:'center'}}>БЛИЖАЙШИЕ РЕЛИЗЫ</div>
           <div className="release-month">МАРТ</div>
           <div className="release-row">{march.map((m,i)=>(
             <div className="movie-thumb" key={m.id} onClick={()=>onMovie(m)}>
@@ -693,7 +693,6 @@ function AdminPanel({db,onDBChange,onBack,binKey,binDbId}){
 
       {subtab==='add'&&<div className="admin-form">
         <h2>{editId?'РЕДАКТИРОВАТЬ':'ДОБАВИТЬ'}</h2>
-        <div className="admin-warn">⚠ Для постеров вставляйте только <strong>https://</strong> ссылки — они видны на всех устройствах.</div>
         <div className="admin-row">
           <div>
             <div style={{fontSize:11,color:'#aaa',marginBottom:4}}>НАЗВАНИЕ *</div>
