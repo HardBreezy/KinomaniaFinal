@@ -274,23 +274,6 @@ function SetupBanner({onSave}){
     lsSet('km_cfg',{key,usersId,dbId});
     onSave(key,usersId,dbId);
   };
-  return(
-    <div className="page">
-      <div className="setup-box">
-        <h3>⚙ НАСТРОЙКА ОБЛАЧНОГО ХРАНИЛИЩА</h3>
-        <p>Для синхронизации профилей и базы данных между устройствами необходимо настроить <strong>JSONBin.io</strong> (бесплатно):</p>
-        <p>1. Зарегистрируйтесь на <code>jsonbin.io</code></p>
-        <p>2. Скопируйте <code>Master Key</code> из раздела API Keys</p>
-        <p>3. Создайте два бина: первый с содержимым <code>{"{"}"users":{"{}"{"}"}</code>, второй с <code>{"{"}"movies":[]{"}"}</code></p>
-        <p>4. Скопируйте ID обоих бинов и вставьте ниже:</p>
-        <input className="setup-input" placeholder="Master Key ($2b$10$...)" value={key} onChange={e=>setKey(e.target.value)}/>
-        <input className="setup-input" placeholder="BIN ID — пользователи" value={usersId} onChange={e=>setUsersId(e.target.value)}/>
-        <input className="setup-input" placeholder="BIN ID — фильмы" value={dbId} onChange={e=>setDbId(e.target.value)}/>
-        <button className="admin-btn" onClick={save}>СОХРАНИТЬ И ПОДКЛЮЧИТЬ</button>
-        <p style={{marginTop:12,fontSize:11,color:'#666'}}>Эти данные хранятся в localStorage вашего браузера и нигде не передаются кроме jsonbin.io.</p>
-      </div>
-    </div>
-  );
 }
 
 // ── Auth Modal ────────────────────────────────────────
