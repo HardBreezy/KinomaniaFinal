@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Киномания</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#1a1a1a;color:#fff;font-family:'Roboto Condensed',sans-serif;min-height:100vh}
+
+.header{background:#000;display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:60px;position:sticky;top:0;z-index:100;gap:12px}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:3px;color:#fff;cursor:pointer;user-select:none;white-space:nowrap;flex-shrink:0}
+.header-right{display:flex;align-items:center;gap:8px;flex:1;min-width:0;justify-content:flex-end}
+.search-wrap{display:flex;align-items:center;background:#fff;border-radius:4px;overflow:hidden;height:34px;flex:1;min-width:0;max-width:400px}
+.search-wrap input{border:none;outline:none;padding:0 8px;font-size:14px;font-family:'Roboto Condensed',sans-serif;background:#fff;color:#000;flex:1;min-width:0;width:0}
+.search-icon{padding:0 8px;cursor:pointer;color:#000;font-size:16px;background:#fff;border:none;height:100%;flex-shrink:0}
+.search-clear{padding:0 8px;cursor:pointer;color:#666;font-size:18px;background:#fff;border:none;height:100%;line-height:1;flex-shrink:0}
+.avatar-btn{width:40px;height:40px;border-radius:50%;background:#333;border:2px solid #fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+
+.nav{background:#000;display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid #333}
+.nav-item{padding:12px 0;text-align:center;cursor:pointer;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;color:#bbb;transition:color .2s;border-right:1px solid #333;border-bottom:3px solid transparent;user-select:none}
+.nav-item:last-child{border-right:none}
+.nav-item.active{color:#fff;border-bottom:3px solid #fff}
+.nav-item:hover{color:#fff}
+
+.page{padding:16px;max-width:1200px;margin:0 auto}
+
+.loading{display:flex;align-items:center;justify-content:center;height:300px;flex-direction:column;gap:12px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;color:#555}
+.spinner{width:36px;height:36px;border:3px solid #333;border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.home-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px}
+@media(max-width:900px){.home-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.home-grid{grid-template-columns:1fr}}
+.section-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;margin-bottom:12px}
+.genre-block{margin-bottom:20px}
+.genre-label{background:#000;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px;padding:5px 10px;text-align:center;margin-bottom:8px}
+.genre-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.movie-thumb{cursor:pointer;text-align:center}
+.movie-thumb:hover .poster-wrap img,.movie-thumb:hover .poster-ph{transform:scale(1.04)}
+.poster-wrap{overflow:hidden}
+.poster-wrap img{width:100%;aspect-ratio:2/3;object-fit:cover;display:block;transition:transform .2s}
+.poster-ph{width:100%;aspect-ratio:2/3;background:linear-gradient(135deg,#2a2a2a,#111);display:flex;align-items:center;justify-content:center;font-size:10px;color:#555;text-align:center;padding:8px;line-height:1.3;font-weight:700;text-transform:uppercase;transition:transform .2s}
+.movie-thumb .mtitle{font-size:11px;font-weight:700;text-transform:uppercase;margin-top:4px;line-height:1.3}
+.movie-thumb .myear{font-size:10px;color:#aaa;text-transform:uppercase}
+
+.release-month{font-family:'Bebas Neue',sans-serif;background:#000;color:#fff;padding:5px 10px;text-align:center;margin-bottom:8px;font-size:13px;letter-spacing:2px}
+.release-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.rdate{font-size:10px;color:#aaa;margin-top:3px;text-align:center}
+
+.films-layout{display:grid;grid-template-columns:180px 1fr;gap:20px}
+@media(max-width:600px){.films-layout{grid-template-columns:1fr}}
+.filters h2{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:3px;margin-bottom:16px}
+.filter-group{margin-bottom:14px}
+.filter-group label{font-size:11px;font-weight:700;letter-spacing:1px;display:block;margin-bottom:5px}
+.filter-select{width:100%;background:#2a2a2a;border:1px solid #444;color:#fff;padding:7px 8px;font-family:'Roboto Condensed',sans-serif;font-size:13px;cursor:pointer;appearance:none}
+.filter-select option{background:#2a2a2a}
+.filter-reset{width:100%;background:#333;border:none;color:#aaa;padding:7px;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1px;cursor:pointer;margin-top:4px}
+.filter-reset:hover{color:#fff;background:#444}
+
+.movies-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media(max-width:700px){.movies-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:400px){.movies-grid{grid-template-columns:1fr}}
+.movie-card{cursor:pointer;background:#111}
+.movie-card:hover .poster-wrap img,.movie-card:hover .poster-ph{transform:scale(1.03)}
+.mc-title{font-size:12px;font-weight:700;text-transform:uppercase;padding:6px 6px 2px;line-height:1.3}
+.mc-meta{font-size:11px;color:#aaa;padding:0 6px 6px;text-transform:uppercase}
+
+.info-banner{background:linear-gradient(135deg,#111 0%,#2a2a2a 100%);padding:50px 30px;text-align:center;min-height:380px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.info-banner::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/svg%3E")}
+.info-inner{position:relative;z-index:1;max-width:680px}
+.info-inner h1{font-family:'Bebas Neue',sans-serif;font-size:48px;letter-spacing:4px;line-height:1.1;margin-bottom:6px}
+.info-inner h2{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:3px;color:#ccc;margin-bottom:24px}
+.info-inner p{font-size:16px;font-weight:700;line-height:1.6;margin-bottom:10px}
+.info-devices{margin-top:30px;display:flex;justify-content:center;gap:20px;flex-wrap:wrap}
+.info-device{background:#000;border:2px solid #333;padding:16px 24px;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;min-width:130px}
+.info-device .dev-icon{font-size:36px;margin-bottom:6px}
+
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:1000;display:flex;align-items:center;justify-content:center;padding:16px}
+.modal{background:#f5f5f5;color:#000;width:100%;max-width:480px;padding:32px;position:relative;border-radius:2px;max-height:90vh;overflow-y:auto}
+.modal h2{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:3px;text-align:center;margin-bottom:24px}
+.modal-close{position:absolute;right:14px;top:14px;background:#333;color:#fff;border:none;width:30px;height:30px;border-radius:50%;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.modal-label{font-size:11px;font-weight:700;letter-spacing:1px;margin-bottom:5px}
+.modal-input{width:100%;border:2px solid #ccc;padding:11px 12px;font-size:14px;font-family:'Roboto Condensed',sans-serif;margin-bottom:14px;outline:none;background:#fff}
+.modal-input:focus{border-color:#000}
+.modal-input:disabled{background:#eee;color:#888}
+.modal-submit{width:100%;background:#000;color:#fff;border:none;padding:13px;font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:3px;cursor:pointer;transition:background .2s;margin-bottom:4px}
+.modal-submit:hover:not(:disabled){background:#333}
+.modal-submit:disabled{background:#999;cursor:not-allowed}
+.modal-error{color:#c00;font-size:12px;margin-bottom:10px;text-align:center;font-weight:700}
+.modal-info{color:#555;font-size:12px;margin-bottom:10px;text-align:center}
+.modal-switch{text-align:center;margin-top:12px;font-size:13px}
+.modal-switch span{cursor:pointer;text-decoration:underline;font-weight:700}
+
+.movie-detail{max-width:860px;margin:0 auto;padding:24px 16px}
+.md-top{display:flex;gap:24px;margin-bottom:24px}
+@media(max-width:600px){.md-top{flex-direction:column}}
+.md-poster{width:200px;flex-shrink:0}
+@media(max-width:600px){.md-poster{width:100%;max-width:240px}}
+.md-poster .poster-wrap img,.md-poster .poster-ph{width:100%;aspect-ratio:2/3;object-fit:cover;display:block}
+.md-title{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:3px;line-height:1.1;margin-bottom:8px}
+.md-meta{color:#aaa;font-size:13px;margin-bottom:14px;text-transform:uppercase}
+.md-badge{display:inline-block;background:#222;border:1px solid #444;padding:3px 9px;font-size:11px;margin-right:5px;margin-bottom:7px;text-transform:uppercase}
+.md-desc{font-size:14px;line-height:1.7;color:#ccc;margin-top:10px}
+.md-actions{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+.btn-fav{background:#fff;color:#000;border:none;padding:9px 20px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;cursor:pointer}
+.btn-fav:hover{background:#ddd}
+.btn-fav.active{background:#e50914;color:#fff}
+.btn-back{background:transparent;color:#fff;border:2px solid #fff;padding:9px 20px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;cursor:pointer}
+.btn-back:hover{background:#fff;color:#000}
+
+.profile-page{max-width:680px;margin:0 auto;padding:24px 16px}
+.profile-page h1{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:3px;margin-bottom:18px}
+.profile-info{background:#111;padding:18px;margin-bottom:18px;border:1px solid #333}
+.profile-info p{margin-bottom:6px;font-size:14px}
+.fav-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+@media(max-width:500px){.fav-grid{grid-template-columns:repeat(3,1fr)}}
+.fav-section-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;margin-bottom:12px}
+.logout-btn{background:transparent;color:#fff;border:2px solid #fff;padding:9px 22px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;cursor:pointer;margin-top:10px}
+.logout-btn:hover{background:#fff;color:#000}
+
+.search-results{padding:16px;max-width:1200px;margin:0 auto}
+.search-results h2{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:3px;margin-bottom:18px}
+.no-results{text-align:center;color:#555;font-size:16px;padding:50px 0;font-family:'Bebas Neue',sans-serif;letter-spacing:2px}
+
+.footer{background:#000;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;margin-top:32px;border-top:1px solid #222;flex-wrap:wrap;gap:8px}
+.footer-social{display:flex;align-items:center;gap:4px;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1px}
+.social-icon{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;margin-left:5px}
+.footer-copy{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1px;color:#666}
+.footer-contact{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1px;color:#aaa;cursor:pointer}
+.footer-contact:hover{color:#fff}
+
+.admin-page{max-width:960px;margin:0 auto;padding:24px 16px}
+.admin-page h1{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:3px;margin-bottom:20px}
+.admin-form{background:#111;border:1px solid #333;padding:20px;margin-bottom:28px}
+.admin-form h2{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;margin-bottom:16px}
+.admin-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+@media(max-width:500px){.admin-row{grid-template-columns:1fr}}
+.admin-input{width:100%;background:#222;border:1px solid #444;color:#fff;padding:8px 10px;font-family:'Roboto Condensed',sans-serif;font-size:13px;outline:none}
+.admin-input:focus{border-color:#fff}
+.admin-select{width:100%;background:#222;border:1px solid #444;color:#fff;padding:8px 10px;font-family:'Roboto Condensed',sans-serif;font-size:13px;appearance:none}
+.admin-textarea{width:100%;background:#222;border:1px solid #444;color:#fff;padding:8px 10px;font-family:'Roboto Condensed',sans-serif;font-size:13px;resize:vertical;min-height:72px;margin-bottom:10px;outline:none}
+.admin-textarea:focus{border-color:#fff}
+.admin-btn{background:#fff;color:#000;border:none;padding:8px 18px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;cursor:pointer;margin-right:8px}
+.admin-btn:hover{background:#ddd}
+.admin-btn.danger{background:#e50914;color:#fff}
+.admin-btn.danger:hover{background:#c00}
+.admin-btn.secondary{background:#333;color:#fff}
+.admin-btn.secondary:hover{background:#555}
+.admin-table{width:100%;border-collapse:collapse;font-size:12px}
+.admin-table th{background:#000;color:#fff;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;padding:8px 6px;text-align:left;border-bottom:2px solid #333}
+.admin-table td{padding:6px;border-bottom:1px solid #222;vertical-align:middle}
+.admin-table tr:hover td{background:#1a1a1a}
+.poster-mini{width:32px;height:48px;object-fit:cover;display:block}
+.poster-mini-ph{width:32px;height:48px;background:#222;display:flex;align-items:center;justify-content:center;font-size:8px;color:#555;text-align:center}
+.admin-success{color:#4caf50;font-size:12px;margin-top:8px;font-weight:700}
+.admin-warn{background:#2a1a00;border:1px solid #664400;color:#ffaa44;padding:10px 14px;font-size:12px;margin-bottom:14px;line-height:1.6}
+.admin-tab-row{display:flex;margin-bottom:20px;border-bottom:2px solid #333}
+.admin-tab{font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;padding:9px 20px;cursor:pointer;color:#666;border-bottom:3px solid transparent;margin-bottom:-2px}
+.admin-tab.active{color:#fff;border-bottom:3px solid #fff}
+.setup-box{background:#111;border:2px solid #664400;padding:24px;margin:20px 0;max-width:600px}
+.setup-box h3{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:#ffaa44;margin-bottom:12px}
+.setup-box p{font-size:13px;color:#ccc;margin-bottom:8px;line-height:1.6}
+.setup-box code{background:#222;padding:2px 6px;font-size:12px;color:#ffaa44}
+.setup-input{width:100%;background:#222;border:1px solid #664400;color:#fff;padding:9px 12px;font-family:'Roboto Condensed',sans-serif;font-size:13px;margin-bottom:10px;outline:none}
+.setup-input:focus{border-color:#ffaa44}
+.sync-ok{color:#4caf50;font-size:11px;font-weight:700}
+.sync-err{color:#f44;font-size:11px;font-weight:700}
+.sync-ing{color:#88f;font-size:11px;font-weight:700}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const {useState,useEffect,useCallback,useMemo,useRef}=React;
+
+// ══════════════════════════════════════════════════════
+// ▼▼▼  ВСТАВЬТЕ ВАШИ ДАННЫЕ JSONBIN СЮДА  ▼▼▼
+const JSONBIN_KEY   = '$2a$10$rNqCUDpHIVuyjRcBT7VrROsIYLSRANH6raCD4IB/fQbvFXOJFGwoW';   // Master Key с сайта jsonbin.io
+const BIN_USERS_ID  = '6a1b43ae21f9ee59d29ece58';   // ID бина для пользователей ({"users":{}})
+const BIN_DB_ID     = '6a1b43d4ddf5aa59f7796afd';   // ID бина для фильмов     ({"movies":[]})
+// ▲▲▲  ВСТАВЬТЕ ВАШИ ДАННЫЕ JSONBIN СЮДА  ▲▲▲
+// ══════════════════════════════════════════════════════
+
+const CONFIGURED = JSONBIN_KEY && BIN_USERS_ID && BIN_DB_ID;
+
+// ── localStorage helpers ──────────────────────────────
+const lsGet=(k,d)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch{return d}};
+const lsSet=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}};
+
+// ── JSONBin API ───────────────────────────────────────
+const BIN_BASE = 'https://api.jsonbin.io/v3/b';
+
+async function binRead(binId) {
+  const cached = lsGet('bin_'+binId, null);
+  try {
+    const r = await fetch(`${BIN_BASE}/${binId}/latest`, {
+      headers: { 'X-Master-Key': JSONBIN_KEY }
+    });
+    if (!r.ok) throw new Error('read failed '+r.status);
+    const data = await r.json();
+    const val = data.record;
+    lsSet('bin_'+binId, val);
+    return val;
+  } catch(e) {
+    console.warn('binRead fallback:', e.message);
+    return cached;
+  }
+}
+
+async function binWrite(binId, value) {
+  lsSet('bin_'+binId, value);
+  if (!CONFIGURED) return false;
+  try {
+    const r = await fetch(`${BIN_BASE}/${binId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Master-Key': JSONBIN_KEY
+      },
+      body: JSON.stringify(value)
+    });
+    return r.ok;
+  } catch(e) {
+    console.warn('binWrite failed:', e.message);
+    return false;
+  }
+}
+
+// ── Fallback DB ───────────────────────────────────────
+function getFallbackDB(){return{movies:[
+  {id:1,title:"Дюна: Часть Третья",year:2026,genre:"Боевик",country:"США",type:"movie",poster:"",desc:"Продолжение эпической саги о Поле Атрейдесе и его пути к власти на планете Арракис."},
+  {id:2,title:"Мстители: Доктор Дум",year:2026,genre:"Боевик",country:"США",type:"movie",poster:"",desc:"Могущественный Доктор Дум бросает вызов Мстителям и угрожает существованию всей вселенной."},
+  {id:3,title:"Ёлки 13",year:2026,genre:"Комедия",country:"Россия",type:"movie",poster:"",desc:"Тринадцатая часть любимой новогодней комедии."},
+  {id:4,title:"Ночная тишина",year:2026,genre:"Комедия",country:"Россия",type:"movie",poster:"",desc:"Комедийная история о тихой ночи, превратившейся в череду невероятных событий."},
+  {id:5,title:"Легенды наших предков",year:2025,genre:"Фэнтзи",country:"Россия",type:"movie",poster:"",desc:"Молодая героиня отправляется в магическое путешествие по землям духов."},
+  {id:6,title:"Кейпоп-охотницы на демонов",year:2025,genre:"Боевик",country:"Корея",type:"movie",poster:"",desc:"Группа K-pop артисток тайно является охотниками на демонов."},
+  {id:7,title:"Рай под ногами матерей",year:2024,genre:"Драма",country:"Россия",type:"movie",poster:"",desc:"Трогательная история о материнской любви и жертвенности."},
+  {id:8,title:"Казнить нельзя помиловать",year:2026,genre:"Триллер",country:"Россия",type:"movie",poster:"",desc:"Юридический триллер о несправедливости системы."},
+  {id:9,title:"Домовёнок Кузя 2",year:2025,genre:"Фантастика",country:"Россия",type:"movie",poster:"",desc:"Любимый домовёнок Кузя возвращается в новом приключении."},
+  {id:10,title:"На цепи",year:2025,genre:"Боевик",country:"Россия",type:"movie",poster:"",desc:"Бывший спецназовец втянут в смертельную игру криминального мира."},
+  {id:11,title:"Королёк моей любви",year:2025,genre:"Комедия",country:"Россия",type:"movie",poster:"",desc:"Романтическая комедия о неожиданной встрече двух разных людей."},
+  {id:12,title:"Ночная тишина 2",year:2025,genre:"Хоррор",country:"США",type:"movie",poster:"",desc:"Продолжение хоррора о доме, в котором не бывает тишины."},
+  {id:13,title:"57 секунд",year:2025,genre:"Боевик",country:"США",type:"movie",poster:"",desc:"Технологический триллер о кольце, дающем возможность перемотать время."},
+  {id:101,title:"Слово пацана",year:2024,genre:"Драма",country:"Россия",type:"series",seasons:1,poster:"",desc:"Криминальная драма о молодёжных группировках Казани 80-х."},
+  {id:102,title:"Эпидемия",year:2024,genre:"Триллер",country:"Россия",type:"series",seasons:2,poster:"",desc:"Выжившие после вируса пытаются добраться до Байкала."},
+  {id:103,title:"Нулевой пациент",year:2024,genre:"Драма",country:"Россия",type:"series",seasons:1,poster:"",desc:"История о первых случаях ВИЧ в СССР."},
+  {id:104,title:"Чиновники",year:2025,genre:"Комедия",country:"Россия",type:"series",seasons:1,poster:"",desc:"Сатирическая комедия о работниках провинциальной администрации."},
+  {id:105,title:"Мир Дикого Запада",year:2024,genre:"Фантастика",country:"США",type:"series",seasons:4,poster:"",desc:"В футуристическом парке развлечений роботы начинают обретать сознание."},
+  {id:106,title:"Разрыв",year:2025,genre:"Триллер",country:"Россия",type:"series",seasons:1,poster:"",desc:"Психологический триллер о семье в тихом загородном доме."},
+]}}
+
+// ── Poster ────────────────────────────────────────────
+function Poster({src,alt,mini}){
+  const[err,setErr]=useState(false);
+  if(err||!src){
+    if(mini)return<div className="poster-mini-ph">{(alt||'').slice(0,5)}</div>;
+    return<div className="poster-ph">{alt||'Постер'}</div>;
+  }
+  return<div className="poster-wrap"><img src={src} alt={alt||''} onError={()=>setErr(true)}/></div>;
+}
+
+// ── Setup Banner (если не настроен JSONBin) ───────────
+function SetupBanner({onSave}){
+  const[key,setKey]=useState('');
+  const[usersId,setUsersId]=useState('');
+  const[dbId,setDbId]=useState('');
+  const save=()=>{
+    if(!key||!usersId||!dbId){alert('Заполните все три поля');return;}
+    lsSet('km_cfg',{key,usersId,dbId});
+    onSave(key,usersId,dbId);
+  };
+  return(
+    <div className="page">
+      <div className="setup-box">
+        <h3>⚙ НАСТРОЙКА ОБЛАЧНОГО ХРАНИЛИЩА</h3>
+        <p>Для синхронизации профилей и базы данных между устройствами необходимо настроить <strong>JSONBin.io</strong> (бесплатно):</p>
+        <p>1. Зарегистрируйтесь на <code>jsonbin.io</code></p>
+        <p>2. Скопируйте <code>Master Key</code> из раздела API Keys</p>
+        <p>3. Создайте два бина: первый с содержимым <code>{"{"}"users":{"{}"{"}"}</code>, второй с <code>{"{"}"movies":[]{"}"}</code></p>
+        <p>4. Скопируйте ID обоих бинов и вставьте ниже:</p>
+        <input className="setup-input" placeholder="Master Key ($2b$10$...)" value={key} onChange={e=>setKey(e.target.value)}/>
+        <input className="setup-input" placeholder="BIN ID — пользователи" value={usersId} onChange={e=>setUsersId(e.target.value)}/>
+        <input className="setup-input" placeholder="BIN ID — фильмы" value={dbId} onChange={e=>setDbId(e.target.value)}/>
+        <button className="admin-btn" onClick={save}>СОХРАНИТЬ И ПОДКЛЮЧИТЬ</button>
+        <p style={{marginTop:12,fontSize:11,color:'#666'}}>Эти данные хранятся в localStorage вашего браузера и нигде не передаются кроме jsonbin.io.</p>
+      </div>
+    </div>
+  );
+}
+
+// ── Auth Modal ────────────────────────────────────────
+function AuthModal({onClose,onAuth,binKey,binUsersId}){
+  const[mode,setMode]=useState('start');
+  const[email,setEmail]=useState('');
+  const[password,setPassword]=useState('');
+  const[name,setName]=useState('');
+  const[error,setError]=useState('');
+  const[loading,setLoading]=useState(false);
+
+  const readUsers=async()=>{
+    if(binKey&&binUsersId){
+      const data=await binRead(binUsersId);
+      return data?.users||{};
+    }
+    return lsGet('km_users',{});
+  };
+
+  const writeUsers=async(users)=>{
+    if(binKey&&binUsersId){
+      await binWrite(binUsersId,{users});
+    } else {
+      lsSet('km_users',users);
+    }
+  };
+
+  const nextFromStart=async()=>{
+    setError('');
+    if(!email.includes('@')){setError('Введите корректный email');return;}
+    setLoading(true);
+    const users=await readUsers();
+    setLoading(false);
+    setMode(users[email]?'login':'register');
+  };
+
+  const submit=async()=>{
+    setError('');setLoading(true);
+    const users=await readUsers();
+    if(mode==='login'){
+      if(!users[email]){setLoading(false);setError('Пользователь не найден');return;}
+      if(users[email].password!==password){setLoading(false);setError('Неверный пароль');return;}
+      const u={email,name:users[email].name,isAdmin:!!users[email].isAdmin};
+      lsSet('km_cur',u);setLoading(false);onAuth(u);
+    } else {
+      if(!name.trim()){setLoading(false);setError('Введите имя');return;}
+      if(password.length<4){setLoading(false);setError('Пароль минимум 4 символа');return;}
+      const nu={...users,[email]:{password,name:name.trim(),isAdmin:false}};
+      await writeUsers(nu);
+      const u={email,name:name.trim(),isAdmin:false};
+      lsSet('km_cur',u);setLoading(false);onAuth(u);
+    }
+  };
+
+  return(
+    <div className="modal-overlay" onClick={e=>{if(e.target.className==='modal-overlay')onClose()}}>
+      <div className="modal">
+        <button className="modal-close" onClick={onClose}>×</button>
+        <h2>ВХОД / РЕГИСТРАЦИЯ</h2>
+        {error&&<div className="modal-error">{error}</div>}
+        {loading&&<div className="modal-info">⏳ Соединение с облаком...</div>}
+        <div className="modal-label">ЭЛЕКТРОННАЯ ПОЧТА:</div>
+        <input className="modal-input" type="email" placeholder="email@example.com"
+          value={email} onChange={e=>setEmail(e.target.value)}
+          onKeyDown={e=>e.key==='Enter'&&(mode==='start'?nextFromStart():submit())}
+          disabled={mode!=='start'||loading}/>
+        {mode!=='start'&&<>
+          {mode==='register'&&<>
+            <div className="modal-label">ИМЯ:</div>
+            <input className="modal-input" type="text" placeholder="Ваше имя"
+              value={name} onChange={e=>setName(e.target.value)} disabled={loading}/>
+          </>}
+          <div className="modal-label">ПАРОЛЬ:</div>
+          <input className="modal-input" type="password" placeholder="Пароль"
+            value={password} onChange={e=>setPassword(e.target.value)}
+            onKeyDown={e=>e.key==='Enter'&&submit()} disabled={loading}/>
+        </>}
+        {mode==='start'&&<button className="modal-submit" onClick={nextFromStart} disabled={loading}>
+          {loading?'ПРОВЕРКА...':'ПРОДОЛЖИТЬ'}
+        </button>}
+        {mode!=='start'&&<button className="modal-submit" onClick={submit} disabled={loading}>
+          {loading?'ЗАГРУЗКА...':(mode==='login'?'ВОЙТИ':'ЗАРЕГИСТРИРОВАТЬСЯ')}
+        </button>}
+        {mode==='login'&&<div className="modal-switch">Нет аккаунта? <span onClick={()=>{setMode('register');setError('')}}>Зарегистрироваться</span></div>}
+        {mode==='register'&&<div className="modal-switch">Есть аккаунт? <span onClick={()=>{setMode('login');setError('')}}>Войти</span></div>}
+        {mode!=='start'&&<div className="modal-switch"><span onClick={()=>{setMode('start');setError('')}}>← Изменить email</span></div>}
+      </div>
+    </div>
+  );
+}
+
+// ── Filters ───────────────────────────────────────────
+function Filters({filters,onChange,movies}){
+  const genres=useMemo(()=>['',...new Set(movies.map(m=>m.genre))].sort(),[movies]);
+  const countries=useMemo(()=>['',...new Set(movies.map(m=>m.country))].sort(),[movies]);
+  const years=useMemo(()=>['',...new Set(movies.map(m=>String(m.year)))].sort((a,b)=>b-a),[movies]);
+  return(
+    <div className="filters">
+      <h2>ФИЛЬТРЫ</h2>
+      {[{k:'year',label:'ГОД',opts:years},{k:'genre',label:'ЖАНР',opts:genres},{k:'country',label:'СТРАНА',opts:countries}].map(({k,label,opts})=>(
+        <div className="filter-group" key={k}>
+          <label>{label}:</label>
+          <select className="filter-select" value={filters[k]} onChange={e=>onChange({...filters,[k]:e.target.value})}>
+            {opts.map(o=><option key={o} value={o}>{o||'—'}</option>)}
+          </select>
+        </div>
+      ))}
+      {(filters.year||filters.genre||filters.country)&&
+        <button className="filter-reset" onClick={()=>onChange({year:'',genre:'',country:''})}>СБРОСИТЬ</button>}
+    </div>
+  );
+}
+
+// ── HomePage ──────────────────────────────────────────
+function HomePage({movies,onMovie}){
+  const ms=movies.filter(m=>m.type==='movie');
+  const action=ms.filter(m=>m.genre==='Боевик').slice(0,2);
+  const comedy=ms.filter(m=>m.genre==='Комедия').slice(0,2);
+  const popular=ms.slice(0,4);
+  const march=ms.slice(8,10);
+  const april=ms.slice(10,12);
+  const Thumb=({movie,date})=>(
+    <div className="movie-thumb" onClick={()=>onMovie(movie)}>
+      <Poster src={movie.poster} alt={movie.title}/>
+      <div className="mtitle">{movie.title}</div>
+      <div className="myear">{date||`${movie.year}, ${movie.genre}`}</div>
+    </div>
+  );
+  return(
+    <div className="page">
+      <div className="home-grid">
+        <div>
+          <div className="section-title">ОЖИДАЕМЫЕ НОВИНКИ</div>
+          <div className="genre-block"><div className="genre-label">БОЕВИК</div>
+            <div className="genre-row">{action.map(m=><Thumb key={m.id} movie={m}/>)}</div></div>
+          <div className="genre-block"><div className="genre-label">КОМЕДИЯ</div>
+            <div className="genre-row">{comedy.map(m=><Thumb key={m.id} movie={m}/>)}</div></div>
+        </div>
+        <div>
+          <div className="section-title" style={{textAlign:'center'}}>ПОПУЛЯРНОЕ</div>
+          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
+            {popular.map(m=><Thumb key={m.id} movie={m}/>)}
+          </div>
+        </div>
+        <div>
+          <div className="section-title" style={{textAlign:'right'}}>БЛИЖАЙШИЕ РЕЛИЗЫ</div>
+          <div className="release-month">МАРТ</div>
+          <div className="release-row">{march.map((m,i)=>(
+            <div className="movie-thumb" key={m.id} onClick={()=>onMovie(m)}>
+              <Poster src={m.poster} alt={m.title}/>
+              <div className="mtitle">{m.title}</div>
+              <div className="rdate">{i===0?'14 марта':'19 марта'}</div>
+            </div>
+          ))}</div>
+          <div className="release-month">АПРЕЛЬ</div>
+          <div className="release-row">{april.map((m,i)=>(
+            <div className="movie-thumb" key={m.id} onClick={()=>onMovie(m)}>
+              <Poster src={m.poster} alt={m.title}/>
+              <div className="mtitle">{m.title}</div>
+              <div className="rdate">{i===0?'1 апреля':'2 апреля'}</div>
+            </div>
+          ))}</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── ListPage ──────────────────────────────────────────
+function ListPage({type,movies,onMovie}){
+  const[filters,setFilters]=useState({genre:'',year:'',country:''});
+  const items=movies.filter(m=>m.type===type);
+  const filtered=items.filter(m=>{
+    if(filters.genre&&m.genre!==filters.genre)return false;
+    if(filters.year&&String(m.year)!==filters.year)return false;
+    if(filters.country&&m.country!==filters.country)return false;
+    return true;
+  });
+  return(
+    <div className="page">
+      <div className="films-layout">
+        <Filters filters={filters} onChange={setFilters} movies={items}/>
+        <div className="movies-grid">
+          {filtered.length===0&&<div className="no-results" style={{gridColumn:'1/-1'}}>Ничего не найдено</div>}
+          {filtered.map(m=>(
+            <div className="movie-card" key={m.id} onClick={()=>onMovie(m)}>
+              <Poster src={m.poster} alt={m.title}/>
+              <div className="mc-title">{m.title}</div>
+              <div className="mc-meta">{m.year}, {m.genre}{m.seasons?`, ${m.seasons} сез.`:''}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── InfoPage ──────────────────────────────────────────
+function InfoPage(){
+  return(
+    <div>
+      <div className="info-banner">
+        <div className="info-inner">
+          <h1>КИНОМАНИЯ</h1>
+          <h2>ДЛЯ ВСЕХ НА ВСЕХ УСТРОЙСТВАХ</h2>
+          <p>Эксклюзивные премьеры, тысячи фильмов, сериалов, мультфильмов.</p>
+          <p>Смотрите и проживайте новые истории каждый день!</p>
+          <div className="info-devices">
+            {[['📱','СМАРТФОН'],['💻','НОУТБУК'],['🖥️','ТЕЛЕВИЗОР'],['📟','ПЛАНШЕТ']].map(([i,l])=>(
+              <div className="info-device" key={l}><div className="dev-icon">{i}</div>{l}</div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── MovieDetail ───────────────────────────────────────
+function MovieDetail({movie,user,onBack,favs,toggleFav,onAuthNeeded}){
+  const isFav=favs.includes(movie.id);
+  return(
+    <div className="movie-detail">
+      <div className="md-top">
+        <div className="md-poster"><Poster src={movie.poster} alt={movie.title}/></div>
+        <div style={{flex:1}}>
+          <div className="md-title">{movie.title}</div>
+          <div className="md-meta">{movie.year} • {movie.genre} • {movie.country}{movie.seasons?` • ${movie.seasons} сез.`:''}</div>
+          <div>{[movie.genre,movie.country,String(movie.year),movie.type==='series'?'Сериал':'Фильм'].map(b=>(
+            <span className="md-badge" key={b}>{b}</span>))}</div>
+          <div className="md-desc">{movie.desc||'Описание отсутствует.'}</div>
+          <div className="md-actions">
+            <button className={`btn-fav${isFav?' active':''}`} onClick={()=>user?toggleFav(movie.id):onAuthNeeded()}>
+              {isFav?'❤ В ИЗБРАННОМ':'♡ В ИЗБРАННОЕ'}
+            </button>
+            <button className="btn-back" onClick={onBack}>← НАЗАД</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── ProfilePage ───────────────────────────────────────
+function ProfilePage({user,movies,onLogout,favs,onMovie,onAdmin}){
+  const favMovies=movies.filter(m=>favs.includes(m.id));
+  return(
+    <div className="profile-page">
+      <h1>ПРОФИЛЬ</h1>
+      <div className="profile-info">
+        <p><strong>Имя:</strong> {user.name}</p>
+        <p><strong>Email:</strong> {user.email}</p>
+      </div>
+      {user.isAdmin&&<button className="admin-btn" style={{marginBottom:16}} onClick={onAdmin}>⚙️ ПАНЕЛЬ АДМИНИСТРАТОРА</button>}
+      <div className="fav-section-title">ИЗБРАННОЕ ({favMovies.length})</div>
+      {favMovies.length===0&&<div style={{color:'#555',marginBottom:16,fontSize:14}}>Ничего не добавлено</div>}
+      <div className="fav-grid">
+        {favMovies.map(m=>(
+          <div className="movie-thumb" key={m.id} onClick={()=>onMovie(m)}>
+            <Poster src={m.poster} alt={m.title}/>
+            <div className="mtitle">{m.title}</div>
+          </div>
+        ))}
+      </div>
+      <br/>
+      <button className="logout-btn" onClick={onLogout}>ВЫЙТИ</button>
+    </div>
+  );
+}
+
+// ── SearchResults ─────────────────────────────────────
+function SearchResults({query,movies,onMovie}){
+  const q=query.toLowerCase().trim();
+  const results=q?movies.filter(m=>
+    m.title.toLowerCase().includes(q)||m.genre.toLowerCase().includes(q)||
+    m.country.toLowerCase().includes(q)||String(m.year).includes(q)):[];
+  return(
+    <div className="search-results">
+      <h2>ПОИСК: «{query}» — {results.length} рез.</h2>
+      {results.length===0&&<div className="no-results">Ничего не найдено</div>}
+      <div className="movies-grid">
+        {results.map(m=>(
+          <div className="movie-card" key={m.id} onClick={()=>onMovie(m)}>
+            <Poster src={m.poster} alt={m.title}/>
+            <div className="mc-title">{m.title}</div>
+            <div className="mc-meta">{m.year}, {m.genre}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── AdminPanel ────────────────────────────────────────
+const GENRES_LIST=["Боевик","Комедия","Драма","Триллер","Фэнтзи","Фантастика","Хоррор","Мелодрама","Анимация","Документальный"];
+const COUNTRIES_LIST=["Россия","США","Корея","Германия","Франция","Великобритания","Япония","Китай","Индия","Италия"];
+const EMPTY_FORM={title:'',year:String(new Date().getFullYear()),genre:'Боевик',country:'Россия',type:'movie',seasons:'1',poster:'',desc:''};
+
+function AdminPanel({db,onDBChange,onBack,binKey,binDbId}){
+  const[subtab,setSubtab]=useState('list');
+  const[form,setForm]=useState(EMPTY_FORM);
+  const[editId,setEditId]=useState(null);
+  const[success,setSuccess]=useState('');
+  const[saving,setSaving]=useState(false);
+  const[filterType,setFilterType]=useState('all');
+  const[srch,setSrch]=useState('');
+  const[syncSt,setSyncSt]=useState('');
+  const movies=db.movies;
+
+  const visible=movies.filter(m=>{
+    if(filterType!=='all'&&m.type!==filterType)return false;
+    if(srch&&!m.title.toLowerCase().includes(srch.toLowerCase()))return false;
+    return true;
+  });
+
+  const setF=(k,v)=>setForm(f=>({...f,[k]:v}));
+
+  const startEdit=(m)=>{
+    setForm({title:m.title,year:String(m.year),genre:m.genre,country:m.country,
+      type:m.type,seasons:String(m.seasons||1),poster:m.poster||'',desc:m.desc||''});
+    setEditId(m.id);setSubtab('add');setSuccess('');
+  };
+
+  const cancelEdit=()=>{setForm(EMPTY_FORM);setEditId(null);setSubtab('list')};
+
+  const persistDB=async(newDB)=>{
+    onDBChange(newDB);
+    setSaving(true);setSyncSt('syncing');
+    let ok=false;
+    if(binKey&&binDbId) ok=await binWrite(binDbId,newDB);
+    else lsSet('km_db_local',newDB);
+    setSaving(false);setSyncSt(ok?'ok':(binKey?'err':'local'));
+    return ok;
+  };
+
+  const save=async()=>{
+    if(!form.title.trim()){alert('Введите название');return;}
+    if(form.poster&&!form.poster.startsWith('http')&&!form.poster.startsWith('//')&&!form.poster.startsWith('posters/')){
+      if(!confirm('Постер не выглядит как URL. Продолжить?'))return;
+    }
+    const entry={
+      id:editId||(Date.now()),title:form.title.trim(),year:parseInt(form.year)||2025,
+      genre:form.genre,country:form.country,type:form.type,poster:form.poster.trim(),desc:form.desc.trim(),
+      ...(form.type==='series'?{seasons:parseInt(form.seasons)||1}:{})
+    };
+    const newMovies=editId?movies.map(m=>m.id===editId?entry:m):[...movies,entry];
+    const ok=await persistDB({...db,movies:newMovies});
+    setSuccess(editId?`Обновлено ✓ ${ok?'(облако)':'(локально)'}`:`Добавлено ✓ ${ok?'(облако)':'(локально)'}`);
+    setForm(EMPTY_FORM);setEditId(null);
+    if(!editId)setSubtab('list');
+  };
+
+  const remove=async(id)=>{
+    if(!confirm('Удалить?'))return;
+    await persistDB({...db,movies:movies.filter(m=>m.id!==id)});
+  };
+
+  const resetDB=async()=>{
+    if(!confirm('Сбросить к начальным данным?'))return;
+    await persistDB(getFallbackDB());
+  };
+
+  const exportDB=()=>{
+    const blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='db.json';a.click();
+  };
+
+  return(
+    <div className="admin-page">
+      <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:16,flexWrap:'wrap',gap:8}}>
+        <h1>АДМИНИСТРАТОР</h1>
+        <div style={{display:'flex',alignItems:'center',gap:10}}>
+          {syncSt==='syncing'&&<span className="sync-ing">⏳ синхронизация...</span>}
+          {syncSt==='ok'&&<span className="sync-ok">☁ синхронизировано</span>}
+          {syncSt==='err'&&<span className="sync-err">⚠ только локально</span>}
+          {syncSt==='local'&&<span className="sync-err">💾 только локально</span>}
+          <button className="btn-back" onClick={onBack}>← НАЗАД</button>
+        </div>
+      </div>
+      {(!binKey||!binDbId)&&<div className="admin-warn">⚠ JSONBin не настроен — изменения сохраняются только на этом устройстве.</div>}
+      <div className="admin-tab-row">
+        <div className={`admin-tab${subtab==='list'?' active':''}`} onClick={()=>{setSubtab('list');cancelEdit()}}>СПИСОК ({movies.length})</div>
+        <div className={`admin-tab${subtab==='add'?' active':''}`} onClick={()=>{setSubtab('add');if(!editId)setForm(EMPTY_FORM)}}>
+          {editId?'РЕДАКТИРОВАТЬ':'ДОБАВИТЬ'}
+        </div>
+      </div>
+
+      {subtab==='list'&&<>
+        <div style={{display:'flex',gap:10,marginBottom:14,flexWrap:'wrap'}}>
+          <input className="admin-input" placeholder="Поиск..." value={srch} onChange={e=>setSrch(e.target.value)} style={{flex:1,minWidth:140}}/>
+          <select className="admin-select" value={filterType} onChange={e=>setFilterType(e.target.value)} style={{width:150}}>
+            <option value="all">Все ({movies.length})</option>
+            <option value="movie">Фильмы ({movies.filter(m=>m.type==='movie').length})</option>
+            <option value="series">Сериалы ({movies.filter(m=>m.type==='series').length})</option>
+          </select>
+          <button className="admin-btn secondary" onClick={exportDB}>ЭКСПОРТ</button>
+          <button className="admin-btn danger" onClick={resetDB}>СБРОС</button>
+        </div>
+        <div style={{overflowX:'auto'}}>
+          <table className="admin-table">
+            <thead><tr><th>Пост.</th><th>Название</th><th>Год</th><th>Жанр</th><th>Страна</th><th>Тип</th><th>Действия</th></tr></thead>
+            <tbody>
+              {visible.map(m=>(
+                <tr key={m.id}>
+                  <td>{m.poster&&(m.poster.startsWith('http')||m.poster.startsWith('//'))
+                    ?<img className="poster-mini" src={m.poster} alt="" onError={e=>e.target.style.display='none'}/>
+                    :<div className="poster-mini-ph">{m.title.slice(0,4)}</div>}</td>
+                  <td style={{maxWidth:180,wordBreak:'break-word'}}>{m.title}</td>
+                  <td>{m.year}</td><td>{m.genre}</td><td>{m.country}</td>
+                  <td>{m.type==='movie'?'Фильм':'Сериал'}{m.seasons?` (${m.seasons}с)`:''}</td>
+                  <td style={{whiteSpace:'nowrap'}}>
+                    <button className="admin-btn" style={{padding:'4px 10px',fontSize:12}} onClick={()=>startEdit(m)}>✏️</button>
+                    {' '}
+                    <button className="admin-btn danger" style={{padding:'4px 10px',fontSize:12}} onClick={()=>remove(m.id)}>🗑️</button>
+                  </td>
+                </tr>
+              ))}
+              {visible.length===0&&<tr><td colSpan={7} style={{textAlign:'center',color:'#555',padding:24}}>Ничего не найдено</td></tr>}
+            </tbody>
+          </table>
+        </div>
+      </>}
+
+      {subtab==='add'&&<div className="admin-form">
+        <h2>{editId?'РЕДАКТИРОВАТЬ':'ДОБАВИТЬ'}</h2>
+        <div className="admin-warn">⚠ Для постеров вставляйте только <strong>https://</strong> ссылки — они видны на всех устройствах.</div>
+        <div className="admin-row">
+          <div>
+            <div style={{fontSize:11,color:'#aaa',marginBottom:4}}>НАЗВАНИЕ *</div>
+            <input className="admin-input" placeholder="Название" value={form.title} onChange={e=>setF('title',e.target.value)}/>
+          </div>
+          <div>
+            <div style={{fontSize:11,color:'#aaa',marginBottom:4}}>ГОД</div>
+            <input className="admin-input" type="number" value={form.year} onChange={e=>setF('year',e.target.value)}/>
+          </div>
+        </div>
+        <div className="admin-row">
+          <div>
+            <div style={{fontSize:11,color:'#aaa',marginBottom:4}}>ЖАНР</div>
+            <select className="admin-select" value={form.genre} onChange={e=>setF('genre',e.target.value)}>
+              {GENRES_LIST.map(g=><option key={g} value={g}>{g}</option>)}
+            </select>
+          </div>
+          <div>
+            <div style={{fontSize:11,color:'#aaa',marginBottom:4}}>СТРАНА</div>
+            <select className="admin-select" value={form.country} onChange={e=>setF('country',e.target.value)}>
+              {COUNTRIES_LIST.map(c=><option key={c} value={c}>{c}</option>)}
+            </select>
+          </div>
+        </div>
+        <div className="admin-row">
+          <div>
+            <div style={{fontSize:11,color:'#aaa',marginBottom:4}}>ТИП</div>
+            <select className="admin-select" value={form.type} onChange={e=>setF('type',e.target.value)}>
+              <option value="movie">Фильм</option>
+              <option value="series">Сериал</option>
+            </select>
+          </div>
+          {form.type==='series'&&<div>
+            <div style={{fontSize:11,color:'#aaa',marginBottom:4}}>СЕЗОНОВ</div>
+            <input className="admin-input" type="number" min="1" value={form.seasons} onChange={e=>setF('seasons',e.target.value)}/>
+          </div>}
+        </div>
+        <div style={{fontSize:11,color:'#aaa',marginBottom:4}}>URL ПОСТЕРА (https://...)</div>
+        <input className="admin-input" placeholder="https://example.com/poster.jpg"
+          value={form.poster} onChange={e=>setF('poster',e.target.value)} style={{width:'100%',marginBottom:10}}/>
+        {form.poster&&(form.poster.startsWith('http')||form.poster.startsWith('//'))&&(
+          <div style={{marginBottom:10}}>
+            <img src={form.poster} alt="" style={{height:100,width:'auto',display:'block',objectFit:'cover'}}
+              onError={e=>e.target.style.display='none'}/>
+          </div>
+        )}
+        <div style={{fontSize:11,color:'#aaa',marginBottom:4}}>ОПИСАНИЕ</div>
+        <textarea className="admin-textarea" placeholder="Краткое описание..."
+          value={form.desc} onChange={e=>setF('desc',e.target.value)}/>
+        <div>
+          <button className="admin-btn" onClick={save} disabled={saving}>
+            {saving?'СОХРАНЕНИЕ...':(editId?'СОХРАНИТЬ':'ДОБАВИТЬ')}
+          </button>
+          <button className="admin-btn secondary" onClick={cancelEdit}>ОТМЕНА</button>
+        </div>
+        {success&&<div className="admin-success">{success}</div>}
+      </div>}
+    </div>
+  );
+}
+
+// ── App ───────────────────────────────────────────────
+function App(){
+  // Конфиг: из кода или из localStorage (если пользователь ввёл через форму)
+  const[cfg,setCfg]=useState(()=>{
+    if(CONFIGURED) return{key:JSONBIN_KEY,usersId:BIN_USERS_ID,dbId:BIN_DB_ID};
+    return lsGet('km_cfg',null);
+  });
+
+  const[db,setDB]=useState(null);
+  const[tab,setTab]=useState('home');
+  const[prevTab,setPrevTab]=useState('home');
+  const[showAuth,setShowAuth]=useState(false);
+  const[user,setUser]=useState(()=>lsGet('km_cur',null));
+  const[favs,setFavs]=useState([]);
+  const[selectedMovie,setSelectedMovie]=useState(null);
+  const[searchInput,setSearchInput]=useState('');
+  const[searchQ,setSearchQ]=useState('');
+  const[showSetup,setShowSetup]=useState(false);
+
+  // Загрузка БД
+  useEffect(()=>{
+    async function init(){
+      // Мгновенный кэш
+      const cached=cfg?lsGet('bin_'+cfg.dbId,null):lsGet('km_db_local',null);
+      if(cached)setDB(cached);
+      // Затем облако
+      if(cfg?.key&&cfg?.dbId){
+        try{
+          const r=await fetch(`https://api.jsonbin.io/v3/b/${cfg.dbId}/latest`,{
+            headers:{'X-Master-Key':cfg.key}
+          });
+          if(r.ok){
+            const d=await r.json();
+            const dbData=d.record;
+            // Инициализация пустого бина
+            if(!dbData?.movies||dbData.movies.length===0){
+              const fb=getFallbackDB();
+              await fetch(`https://api.jsonbin.io/v3/b/${cfg.dbId}`,{
+                method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':cfg.key},
+                body:JSON.stringify(fb)
+              });
+              lsSet('bin_'+cfg.dbId,fb);setDB(fb);
+            } else {
+              lsSet('bin_'+cfg.dbId,dbData);setDB(dbData);
+            }
+          } else if(!cached) setDB(getFallbackDB());
+        }catch{if(!cached)setDB(getFallbackDB());}
+      } else if(!cached){
+        // Пробуем db.json
+        try{
+          const r=await fetch('db.json');
+          if(r.ok){const d=await r.json();lsSet('km_db_local',d);setDB(d);}
+          else setDB(getFallbackDB());
+        }catch{setDB(getFallbackDB());}
+      }
+    }
+    init();
+  },[cfg?.dbId]);
+
+  useEffect(()=>{
+    if(user)setFavs(lsGet('km_favs_'+user.email,[]));
+    else setFavs([]);
+  },[user?.email]);
+
+  const toggleFav=useCallback((id)=>{
+    if(!user)return;
+    const next=favs.includes(id)?favs.filter(x=>x!==id):[...favs,id];
+    setFavs(next);lsSet('km_favs_'+user.email,next);
+  },[user,favs]);
+
+  const goMovie=(m)=>{setPrevTab(tab);setSelectedMovie(m);setTab('detail')};
+  const goBack=()=>{setSelectedMovie(null);setTab(prevTab)};
+  const handleAuth=(u)=>{setUser(u);setShowAuth(false)};
+  const handleLogout=()=>{lsSet('km_cur',null);setUser(null);setTab('home')};
+
+  const doSearch=()=>{
+    const q=searchInput.trim();if(!q)return;
+    setSearchQ(q);setPrevTab(tab);setTab('search');
+  };
+
+  const navClick=(t)=>{
+    if(t==='profile'){if(!user){setShowAuth(true);return;}setTab('profile');return;}
+    setSelectedMovie(null);setTab(t);
+  };
+
+  const handleSetupSave=(key,usersId,dbId)=>{
+    const c={key,usersId,dbId};setCfg(c);setShowSetup(false);
+    // Перезагрузить БД с новым конфигом
+    setDB(null);
+  };
+
+  const movies=db?.movies||[];
+
+  const Header=()=>(
+    <>
+      <div className="header">
+        <div className="logo" onClick={()=>navClick('home')}>КИНОМАНИЯ</div>
+        <div className="header-right">
+          <div className="search-wrap">
+            <button className="search-icon" onClick={doSearch}>🔍</button>
+            <input placeholder="Поиск..." value={searchInput}
+              onChange={e=>setSearchInput(e.target.value)}
+              onKeyDown={e=>e.key==='Enter'&&doSearch()}/>
+            {searchInput&&<button className="search-clear"
+              onClick={()=>{setSearchInput('');if(tab==='search')setTab(prevTab)}}>×</button>}
+          </div>
+          <div className="avatar-btn" onClick={()=>user?navClick('profile'):setShowAuth(true)}>
+            {user?<span style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:14}}>{user.name[0].toUpperCase()}</span>:'👤'}
+          </div>
+        </div>
+      </div>
+      <div className="nav">
+        {[['home','ГЛАВНАЯ'],['movies','ФИЛЬМЫ'],['series','СЕРИАЛЫ'],['info','ИНФО']].map(([t,l])=>(
+          <div key={t} className={`nav-item${tab===t?' active':''}`} onClick={()=>navClick(t)}>{l}</div>
+        ))}
+      </div>
+    </>
+  );
+
+  const Footer=()=>(
+    <div className="footer">
+      <div className="footer-social">
+        НАШИ СОЦСЕТИ:
+        {[['🎵','#111'],['💬','#5865F2'],['✈️','#0088cc'],['▶','#FF0000']].map(([i,c],idx)=>(
+          <div key={idx} className="social-icon" style={{background:c,border:'1px solid #333'}}>{i}</div>
+        ))}
+      </div>
+      <div className="footer-contact" onClick={()=>setShowSetup(v=>!v)}>
+        {cfg?'☁ ОБЛАКО':'⚙ НАСТРОИТЬ ОБЛАКО'}
+      </div>
+      <div className="footer-copy">© 2026 КИНОМАНИЯ</div>
+    </div>
+  );
+
+  if(!db)return(
+    <div>
+      <Header/>
+      <div className="loading"><div className="spinner"></div>ЗАГРУЗКА</div>
+      <Footer/>
+    </div>
+  );
+
+  return(
+    <div>
+      <Header/>
+      {showSetup&&<div className="page" style={{paddingTop:0}}><SetupBanner onSave={handleSetupSave}/></div>}
+      {!showSetup&&<>
+        {tab==='home'&&<HomePage movies={movies} onMovie={goMovie}/>}
+        {tab==='movies'&&<ListPage type="movie" movies={movies} onMovie={goMovie}/>}
+        {tab==='series'&&<ListPage type="series" movies={movies} onMovie={goMovie}/>}
+        {tab==='info'&&<InfoPage/>}
+        {tab==='profile'&&user&&<ProfilePage user={user} movies={movies} onLogout={handleLogout} favs={favs} onMovie={goMovie} onAdmin={()=>setTab('admin')}/>}
+        {tab==='admin'&&<AdminPanel db={db} onDBChange={setDB} onBack={()=>setTab('profile')} binKey={cfg?.key} binDbId={cfg?.dbId}/>}
+        {tab==='search'&&<SearchResults query={searchQ} movies={movies} onMovie={goMovie}/>}
+        {tab==='detail'&&selectedMovie&&<MovieDetail movie={selectedMovie} user={user}
+          onBack={goBack} favs={favs} toggleFav={toggleFav} onAuthNeeded={()=>setShowAuth(true)}/>}
+      </>}
+      <Footer/>
+      {showAuth&&<AuthModal onClose={()=>setShowAuth(false)} onAuth={handleAuth} binKey={cfg?.key} binUsersId={cfg?.usersId}/>}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
