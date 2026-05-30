@@ -269,17 +269,6 @@ function Poster({src,alt,mini}){
   return<div className="poster-wrap"><img src={src} alt={alt||''} onError={()=>setErr(true)}/></div>;
 }
 
-// ── Setup Banner (если не настроен JSONBin) ───────────
-function SetupBanner({onSave}){
-  const[key,setKey]=useState('');
-  const[usersId,setUsersId]=useState('');
-  const[dbId,setDbId]=useState('');
-  const save=()=>{
-    if(!key||!usersId||!dbId){alert('Заполните все три поля');return;}
-    lsSet('km_cfg',{key,usersId,dbId});
-    onSave(key,usersId,dbId);
-  };
-}
 
 // ── Auth Modal ────────────────────────────────────────
 function AuthModal({onClose,onAuth,binKey,binUsersId}){
@@ -783,7 +772,6 @@ function App(){
   const[selectedMovie,setSelectedMovie]=useState(null);
   const[searchInput,setSearchInput]=useState('');
   const[searchQ,setSearchQ]=useState('');
-  const[showSetup,setShowSetup]=useState(false);
 
   // Загрузка БД
   useEffect(()=>{
@@ -851,12 +839,6 @@ function App(){
     setSelectedMovie(null);setTab(t);
   };
 
-  const handleSetupSave=(key,usersId,dbId)=>{
-    const c={key,usersId,dbId};setCfg(c);setShowSetup(false);
-    // Перезагрузить БД с новым конфигом
-    setDB(null);
-  };
-
   const movies=db?.movies||[];
 
   const Header=()=>(
@@ -893,10 +875,7 @@ function App(){
           <div key={idx} className="social-icon" style={{background:c,border:'1px solid #333'}}>{i}</div>
         ))}
       </div>
-      <div className="footer-contact" onClick={()=>setShowSetup(v=>!v)}>
-        {cfg?'☁ ОБЛАКО':'⚙ НАСТРОИТЬ ОБЛАКО'}
-      </div>
-      <div className="footer-copy">© 2026 КИНОМАНИЯ</div>
+      <div className="footer-copy">© Шавлюга Александр</div>
     </div>
   );
 
@@ -911,8 +890,7 @@ function App(){
   return(
     <div>
       <Header/>
-      {showSetup&&<div className="page" style={{paddingTop:0}}><SetupBanner onSave={handleSetupSave}/></div>}
-      {!showSetup&&<>
+      <>
         {tab==='home'&&<HomePage movies={movies} onMovie={goMovie}/>}
         {tab==='movies'&&<ListPage type="movie" movies={movies} onMovie={goMovie}/>}
         {tab==='series'&&<ListPage type="series" movies={movies} onMovie={goMovie}/>}
@@ -922,7 +900,7 @@ function App(){
         {tab==='search'&&<SearchResults query={searchQ} movies={movies} onMovie={goMovie}/>}
         {tab==='detail'&&selectedMovie&&<MovieDetail movie={selectedMovie} user={user}
           onBack={goBack} favs={favs} toggleFav={toggleFav} onAuthNeeded={()=>setShowAuth(true)}/>}
-      </>}
+      </>
       <Footer/>
       {showAuth&&<AuthModal onClose={()=>setShowAuth(false)} onAuth={handleAuth} binKey={cfg?.key} binUsersId={cfg?.usersId}/>}
     </div>
