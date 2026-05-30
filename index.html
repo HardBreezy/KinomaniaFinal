@@ -191,6 +191,11 @@ const CONFIGURED = JSONBIN_KEY && BIN_USERS_ID && BIN_DB_ID;
 // ── localStorage helpers ──────────────────────────────
 const lsGet=(k,d)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch{return d}};
 const lsSet=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}};
+async function hashPassword(password){
+  const data=new TextEncoder().encode(password);
+  const hash=await crypto.subtle.digest('SHA-256',data);
+  return Array.from(new Uint8Array(hash)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
 
 // ── JSONBin API ───────────────────────────────────────
 const BIN_BASE = 'https://api.jsonbin.io/v3/b';
@@ -315,13 +320,13 @@ function AuthModal({onClose,onAuth,binKey,binUsersId}){
     const users=await readUsers();
     if(mode==='login'){
       if(!users[email]){setLoading(false);setError('Пользователь не найден');return;}
-      if(users[email].password!==password){setLoading(false);setError('Неверный пароль');return;}
+      if(users[email].password!==await hashPassword(password)){setLoading(false);setError('Неверный пароль');return;}
       const u={email,name:users[email].name,isAdmin:!!users[email].isAdmin};
       lsSet('km_cur',u);setLoading(false);onAuth(u);
     } else {
       if(!name.trim()){setLoading(false);setError('Введите имя');return;}
       if(password.length<4){setLoading(false);setError('Пароль минимум 4 символа');return;}
-      const nu={...users,[email]:{password,name:name.trim(),isAdmin:false}};
+      const nu={...users,[email]:{password:await hashPassword(password),name:name.trim(),isAdmin:false}};
       await writeUsers(nu);
       const u={email,name:name.trim(),isAdmin:false};
       lsSet('km_cur',u);setLoading(false);onAuth(u);
