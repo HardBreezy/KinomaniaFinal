@@ -179,11 +179,9 @@ body{background:#1a1a1a;color:#fff;font-family:'Roboto Condensed',sans-serif;min
 const {useState,useEffect,useCallback,useMemo,useRef}=React;
 
 // ══════════════════════════════════════════════════════
-// ▼▼▼  ВСТАВЬТЕ ВАШИ ДАННЫЕ JSONBIN СЮДА  ▼▼▼
-const JSONBIN_KEY   = '$2a$10$rNqCUDpHIVuyjRcBT7VrROsIYLSRANH6raCD4IB/fQbvFXOJFGwoW';   // Master Key с сайта jsonbin.io
-const BIN_USERS_ID  = '6a1b43ae21f9ee59d29ece58';   // ID бина для пользователей ({"users":{}})
-const BIN_DB_ID     = '6a1b43d4ddf5aa59f7796afd';   // ID бина для фильмов     ({"movies":[]})
-// ▲▲▲  ВСТАВЬТЕ ВАШИ ДАННЫЕ JSONBIN СЮДА  ▲▲▲
+const JSONBIN_KEY   = '$2a$10$rNqCUDpHIVuyjRcBT7VrROsIYLSRANH6raCD4IB/fQbvFXOJFGwoW'; 
+const BIN_USERS_ID  = '6a1b43ae21f9ee59d29ece58'; 
+const BIN_DB_ID     = '6a1b43d4ddf5aa59f7796afd'; 
 // ══════════════════════════════════════════════════════
 
 const CONFIGURED = JSONBIN_KEY && BIN_USERS_ID && BIN_DB_ID;
