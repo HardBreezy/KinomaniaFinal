@@ -753,6 +753,33 @@ function AdminPanel({db,onDBChange,onBack,binKey,binDbId}){
 }
 
 // ── App ───────────────────────────────────────────────
+const Header=({navClick,doSearch,searchInput,setSearchInput,tab,setTab,prevTab,user,setShowAuth})=>(
+    <>
+      <div className="header">
+        <div className="logo" onClick={()=>navClick('home')}>КИНОМАНИЯ</div>
+        <div className="header-right">
+          <div className="search-wrap">
+            <button className="search-icon" onClick={doSearch}>🔍</button>
+            <input placeholder="Поиск..." value={searchInput}
+              onChange={e=>setSearchInput(e.target.value)}
+              onKeyDown={e=>e.key==='Enter'&&doSearch()}/>
+            {searchInput&&<button className="search-clear"
+              onClick={()=>{setSearchInput('');if(tab==='search')setTab(prevTab)}}>×</button>}
+          </div>
+          <div className="avatar-btn" onClick={()=>user?navClick('profile'):setShowAuth(true)}>
+            {user?<span style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:14}}>{user.name[0].toUpperCase()}</span>:'👤'}
+          </div>
+        </div>
+      </div>
+      <div className="nav">
+        {[['home','ГЛАВНАЯ'],['movies','ФИЛЬМЫ'],['series','СЕРИАЛЫ'],['info','ИНФО']].map(([t,l])=>(
+          <div key={t} className={`nav-item${tab===t?' active':''}`} onClick={()=>navClick(t)}>{l}</div>
+        ))}
+      </div>
+    </>
+  );
+
+  
 function App(){
   // Конфиг: из кода или из localStorage (если пользователь ввёл через форму)
   const[cfg,setCfg]=useState(()=>{
@@ -838,32 +865,6 @@ function App(){
 
   const movies=db?.movies||[];
 
-  const Header=()=>(
-    <>
-      <div className="header">
-        <div className="logo" onClick={()=>navClick('home')}>КИНОМАНИЯ</div>
-        <div className="header-right">
-          <div className="search-wrap">
-            <button className="search-icon" onClick={doSearch}>🔍</button>
-            <input placeholder="Поиск..." value={searchInput}
-              onChange={e=>setSearchInput(e.target.value)}
-              onKeyDown={e=>e.key==='Enter'&&doSearch()}/>
-            {searchInput&&<button className="search-clear"
-              onClick={()=>{setSearchInput('');if(tab==='search')setTab(prevTab)}}>×</button>}
-          </div>
-          <div className="avatar-btn" onClick={()=>user?navClick('profile'):setShowAuth(true)}>
-            {user?<span style={{fontFamily:"'Bebas Neue',sans-serif",fontSize:14}}>{user.name[0].toUpperCase()}</span>:'👤'}
-          </div>
-        </div>
-      </div>
-      <div className="nav">
-        {[['home','ГЛАВНАЯ'],['movies','ФИЛЬМЫ'],['series','СЕРИАЛЫ'],['info','ИНФО']].map(([t,l])=>(
-          <div key={t} className={`nav-item${tab===t?' active':''}`} onClick={()=>navClick(t)}>{l}</div>
-        ))}
-      </div>
-    </>
-  );
-
   const Footer=()=>(
     <div className="footer">
       <div className="footer-social">
@@ -878,7 +879,7 @@ function App(){
 
   if(!db)return(
     <div>
-      <Header/>
+      <Header navClick={navClick} doSearch={doSearch} searchInput={searchInput} setSearchInput={setSearchInput} tab={tab} setTab={setTab} prevTab={prevTab} user={user} setShowAuth={setShowAuth}/>
       <div className="loading"><div className="spinner"></div>ЗАГРУЗКА</div>
       <Footer/>
     </div>
@@ -886,7 +887,7 @@ function App(){
 
   return(
     <div>
-      <Header/>
+      <Header navClick={navClick} doSearch={doSearch} searchInput={searchInput} setSearchInput={setSearchInput} tab={tab} setTab={setTab} prevTab={prevTab} user={user} setShowAuth={setShowAuth}/>
       <>
         {tab==='home'&&<HomePage movies={movies} onMovie={goMovie}/>}
         {tab==='movies'&&<ListPage type="movie" movies={movies} onMovie={goMovie}/>}
