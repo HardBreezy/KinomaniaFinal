@@ -869,9 +869,25 @@ function App(){
     <div className="footer">
       <div className="footer-social">
         НАШИ СОЦСЕТИ:
-        {[['🎵','#111'],['💬','#5865F2'],['✈️','#0088cc'],['▶','#FF0000']].map(([i,c],idx)=>(
-          <div key={idx} className="social-icon" style={{background:c,border:'1px solid #333'}}>{i}</div>
-        ))}
+        {[
+  ['🎵','#111','https://youtu.be/-Q20EhmiSJ0'],
+  ['💬','#5865F2',null],
+  ['✈️','#0088cc',null],
+  ['▶','#FF0000',null]
+].map(([i,c,url],idx)=>(
+  <div
+    key={idx}
+    className="social-icon"
+    style={{
+      background:c,
+      border:'1px solid #333',
+      cursor:url?'pointer':'default'
+    }}
+    onClick={()=>url&&window.open(url,'_blank')}
+  >
+    {i}
+  </div>
+))}
       </div>
       <div className="footer-copy">© Шавлюга Александр</div>
     </div>
