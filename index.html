@@ -386,7 +386,7 @@ function HomePage({movies,onMovie}){
   const comedy=ms.filter(m=>m.genre==='Комедия').slice(0,2);
   const popular=ms.slice(5,9);
   const march=ms.slice(8,10);
-  const april=ms.slice(11,13);
+  const april=ms.slice(11,12);
   const Thumb=({movie,date})=>(
     <div className="movie-thumb" onClick={()=>onMovie(movie)}>
       <Poster src={movie.poster} alt={movie.title}/>
@@ -412,7 +412,7 @@ function HomePage({movies,onMovie}){
         </div>
         <div>
           <div className="section-title" style={{textAlign:'center'}}>БЛИЖАЙШИЕ РЕЛИЗЫ</div>
-          <div className="release-month">МАРТ</div>
+          <div className="release-month">ИЮНЬ</div>
           <div className="release-row">{march.map((m,i)=>(
             <div className="movie-thumb" key={m.id} onClick={()=>onMovie(m)}>
               <Poster src={m.poster} alt={m.title}/>
@@ -420,7 +420,7 @@ function HomePage({movies,onMovie}){
               <div className="rdate">{i===0?'14 марта':'19 марта'}</div>
             </div>
           ))}</div>
-          <div className="release-month">АПРЕЛЬ</div>
+          <div className="release-month">ИЮЛЬ</div>
           <div className="release-row">{april.map((m,i)=>(
             <div className="movie-thumb" key={m.id} onClick={()=>onMovie(m)}>
               <Poster src={m.poster} alt={m.title}/>
