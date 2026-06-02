@@ -759,7 +759,6 @@ const Header=({navClick,doSearch,searchInput,setSearchInput,tab,setTab,prevTab,u
         <div className="logo" onClick={()=>navClick('home')}>КИНОМАНИЯ</div>
         <div className="header-right">
           <div className="search-wrap">
-            <button className="search-icon" onClick={doSearch}>🔍</button>
             <input placeholder="Поиск..." value={searchInput}
               onChange={e=>setSearchInput(e.target.value)}
               onKeyDown={e=>e.key==='Enter'&&doSearch()}/>
