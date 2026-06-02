@@ -384,7 +384,7 @@ function HomePage({movies,onMovie}){
   const ms=movies.filter(m=>m.type==='movie');
   const action=ms.filter(m=>m.genre==='Боевик').slice(0,2);
   const comedy=ms.filter(m=>m.genre==='Комедия').slice(0,2);
-  const popular=ms.slice(0,4);
+  const popular=ms.slice(5,9);
   const march=ms.slice(8,10);
   const april=ms.slice(10,12);
   const Thumb=({movie,date})=>(
