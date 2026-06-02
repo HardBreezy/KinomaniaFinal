@@ -386,7 +386,7 @@ function HomePage({movies,onMovie}){
   const comedy=ms.filter(m=>m.genre==='Комедия').slice(0,2);
   const popular=ms.slice(5,9);
   const march=ms.slice(8,10);
-  const april=ms.slice(10,12);
+  const april=ms.slice(10,13);
   const Thumb=({movie,date})=>(
     <div className="movie-thumb" onClick={()=>onMovie(movie)}>
       <Poster src={movie.poster} alt={movie.title}/>
